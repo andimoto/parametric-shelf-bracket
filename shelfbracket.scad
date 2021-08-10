@@ -13,21 +13,32 @@ points = [
 ];
 
 
+shelfLen = 145;
+wallLen = 105;
+bracketWidth = 25;
+bracketThickness = 10;
 
-screwR = 5 /2;
-screw2R = 3.5 /2;
+wallScrewDia = 5;
+shelfScrewDia = 3.5;
 
-module screw(R,len)
+cutEdges = true;
+edgeShiftShelf = 3;
+edgeShiftWall = 3;
+
+
+
+
+module screw(screwDia,len)
 {
-  cylinder(r=R, h=len);
-  cylinder(r1=R*2,r2=R,h=5);
+  cylinder(r=screwDia/2, h=len);
+  cylinder(r1=screwDia,r2=screwDia/2,h=5);
 }
 
-module screw2(R,len)
+module screw2(screwDia,len)
 {
-  cylinder(r=R, h=len);
-  translate([0,0,3]) cylinder(r1=R*2,r2=R,h=3);
-  cylinder(r=R*2, h=3);
+  cylinder(r=screwDia/2, h=len);
+  translate([0,0,3]) cylinder(r1=screwDia,r2=screwDia/2,h=3);
+  cylinder(r=screwDia, h=3);
 }
 
 
@@ -41,23 +52,31 @@ module bracket(l1,l2,wall,h)
       cube([l1,wall,h]);
       cube([wall,l2,h]);
     }
-    translate([10,30,10+(25-10)/2]) rotate([0,-90,0]) screw(screwR,wall+5);
-    translate([10,90,10+(25-10)/2]) rotate([0,-90,0]) screw(screwR,wall+5);
+    translate([10,30,10+(25-10)/2]) rotate([0,-90,0]) screw(wallScrewDia,wall+5);
+    translate([10,90,10+(25-10)/2]) rotate([0,-90,0]) screw(wallScrewDia,wall+5);
 
-    translate([30,10,10+(25-10)/2]) rotate([90,0,0]) screw2(screw2R,10);
-    translate([130,10,10+(25-10)/2]) rotate([90,0,0]) screw2(screw2R,10);
+    translate([30,10,10+(25-10)/2]) rotate([90,0,0]) screw2(shelfScrewDia,bracketThickness);
+    translate([130,10,10+(25-10)/2]) rotate([90,0,0]) screw2(shelfScrewDia,bracketThickness);
   }
 }
 
 module shelfbracket()
 {
   difference() {
-    bracket(145,105,10,25);
-    translate([150-sqrt(10^2+10^2)/2,0,0]) rotate([0,45,0]) cube([10,10,10]);
-    translate([0,110-sqrt(10^2+10^2)/2,0]) rotate([-45,0,0]) cube([10,10,10]);
+    bracket(shelfLen,wallLen,bracketThickness,bracketWidth);
 
-    translate([150-sqrt(10^2+10^2)/2,0,25]) rotate([0,45,0])  cube([10,10,10]);
-    translate([0,110-sqrt(10^2+10^2)/2,25]) rotate([-45,0,0]) cube([10,10,10]);
+    if(cutEdges == true)
+    {
+      translate([shelfLen-edgeShiftShelf,0,0]) rotate([0,45,0])
+        cube([bracketWidth,bracketThickness,bracketWidth]);
+      translate([shelfLen-edgeShiftShelf,0,bracketWidth]) rotate([0,45,0])
+        cube([bracketWidth,bracketThickness,bracketWidth]);
+
+      translate([0,wallLen-edgeShiftWall,0]) rotate([-45,0,0])
+        cube([bracketThickness,bracketWidth,bracketWidth]);
+      translate([0,wallLen-edgeShiftWall,bracketWidth]) rotate([-45,0,0])
+        cube([bracketThickness,bracketWidth,bracketWidth]);
+    }
   };
 
   translate([10,10,0])
